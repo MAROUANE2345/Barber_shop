@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import axios from "axios";
+import { serviceSchema } from "@/validations/serviceSchema";
 
 export default function AddServicePage() {
 
@@ -11,19 +12,41 @@ export default function AddServicePage() {
   const [duration, setDuration] = useState("");
   const [imageFile, setImageFile] = useState(null);
 
+  const [errors, setErrors] = useState({});
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const data = {
+      name,
+      description,
+      price,
+      duration,
+      image: imageFile,
+    };
+
+    const result = serviceSchema.safeParse(data);
+
+    // ❌ validation failed
+    if (!result.success) {
+      setErrors(result.error.format());
+      return;
+    }
+
+    setErrors({});
+
     try {
+      const validData = result.data;
+
       const formData = new FormData();
 
-      formData.append("name", name);
-      formData.append("description", description);
-      formData.append("price", price);
-      formData.append("duration", duration);
+      formData.append("name", validData.name);
+      formData.append("description", validData.description);
+      formData.append("price", validData.price);
+      formData.append("duration", validData.duration);
 
-      if (imageFile) {
-        formData.append("image", imageFile);
+      if (validData.image) {
+        formData.append("image", validData.image);
       }
 
       await axios.post("http://localhost:8000/api/services", formData, {
@@ -32,9 +55,7 @@ export default function AddServicePage() {
         },
       });
 
-      alert("Service created successfully");
-
-      // reset
+      // reset (NO ALERTS)
       setName("");
       setDescription("");
       setPrice("");
@@ -43,7 +64,6 @@ export default function AddServicePage() {
 
     } catch (error) {
       console.log(error);
-      alert("Error creating service");
     }
   };
 
@@ -63,31 +83,39 @@ export default function AddServicePage() {
 
         <form className="space-y-6" onSubmit={handleSubmit}>
 
-          {/* Name */}
+          {/* NAME */}
           <div>
             <label className="text-sm text-zinc-300">Service Name</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Beard Trim"
-              className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-blue-500"
+              className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10"
             />
+            {errors?.name && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.name._errors?.[0]}
+              </p>
+            )}
           </div>
 
-          {/* Description */}
+          {/* DESCRIPTION */}
           <div>
             <label className="text-sm text-zinc-300">Description</label>
             <textarea
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe the service..."
-              className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-blue-500"
+              className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10"
             />
+            {errors?.description && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.description._errors?.[0]}
+              </p>
+            )}
           </div>
 
-          {/* Price + Duration */}
+          {/* PRICE + DURATION */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
             <div>
@@ -96,9 +124,13 @@ export default function AddServicePage() {
                 type="number"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                placeholder="0.00"
-                className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-green-500"
+                className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10"
               />
+              {errors?.price && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.price._errors?.[0]}
+                </p>
+              )}
             </div>
 
             <div>
@@ -107,14 +139,18 @@ export default function AddServicePage() {
                 type="number"
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
-                placeholder="30"
-                className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-green-500"
+                className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10"
               />
+              {errors?.duration && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.duration._errors?.[0]}
+                </p>
+              )}
             </div>
 
           </div>
 
-          {/* Image */}
+          {/* IMAGE */}
           <div>
             <label className="text-sm text-zinc-300">Image</label>
             <input
@@ -124,7 +160,7 @@ export default function AddServicePage() {
             />
           </div>
 
-          {/* Buttons */}
+          {/* BUTTONS */}
           <div className="flex gap-4 pt-4">
 
             <button

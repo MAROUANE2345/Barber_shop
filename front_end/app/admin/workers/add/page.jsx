@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import axios from "axios";
+import { workerSchema } from "@/validations/workerSchema";
 
 export default function AddWorkerPage() {
 
@@ -10,20 +11,34 @@ export default function AddWorkerPage() {
   const [phone, setPhone] = useState("");
   const [bio, setBio] = useState("");
 
+  const [errors, setErrors] = useState({});
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const data = {
+      name,
+      role,
+      phone,
+      bio,
+    };
+
+    const result = workerSchema.safeParse(data);
+
+    // ❌ validation failed
+    if (!result.success) {
+      setErrors(result.error.format());
+      return;
+    }
+
+    setErrors({});
+
     try {
-      await axios.post("http://localhost:8000/api/workers", {
-        name,
-        role,
-        phone,
-        bio,
-      });
+      const validData = result.data;
 
-      alert("Worker created successfully");
+      await axios.post("http://localhost:8000/api/workers", validData);
 
-      // reset
+      // reset form (NO ALERTS)
       setName("");
       setRole("");
       setPhone("");
@@ -31,7 +46,6 @@ export default function AddWorkerPage() {
 
     } catch (error) {
       console.log(error);
-      alert("Error creating worker");
     }
   };
 
@@ -51,58 +65,75 @@ export default function AddWorkerPage() {
 
         <form className="space-y-6" onSubmit={handleSubmit}>
 
-          {/* Name */}
+          {/* NAME */}
           <div>
             <label className="text-sm text-zinc-300">Full Name</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. John Doe"
-              className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-blue-500"
+              className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10"
             />
+            {errors?.name && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.name._errors?.[0]}
+              </p>
+            )}
           </div>
 
-          {/* Role */}
+          {/* ROLE */}
           <div>
             <label className="text-sm text-zinc-300">Role</label>
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}
-              className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-blue-500"
+              className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10"
             >
               <option value="">Select role</option>
               <option value="barber">Barber</option>
               <option value="manager">Manager</option>
               <option value="owner">Owner</option>
             </select>
+            {errors?.role && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.role._errors?.[0]}
+              </p>
+            )}
           </div>
 
-          {/* Phone */}
+          {/* PHONE */}
           <div>
             <label className="text-sm text-zinc-300">Phone</label>
             <input
               type="text"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="+212 6..."
-              className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-blue-500"
+              className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10"
             />
+            {errors?.phone && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.phone._errors?.[0]}
+              </p>
+            )}
           </div>
 
-          {/* Bio */}
+          {/* BIO */}
           <div>
             <label className="text-sm text-zinc-300">Bio</label>
             <textarea
               rows={4}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              placeholder="Short description about the worker..."
-              className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-blue-500"
+              className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10"
             />
+            {errors?.bio && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.bio._errors?.[0]}
+              </p>
+            )}
           </div>
 
-          {/* Buttons */}
+          {/* BUTTONS */}
           <div className="flex gap-4 pt-4">
 
             <button
