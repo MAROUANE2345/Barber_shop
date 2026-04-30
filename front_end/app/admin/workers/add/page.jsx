@@ -1,6 +1,40 @@
 "use client";
 
+import { useState } from "react";
+import axios from "axios";
+
 export default function AddWorkerPage() {
+
+  const [name, setName] = useState("");
+  const [role, setRole] = useState("");
+  const [phone, setPhone] = useState("");
+  const [bio, setBio] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      await axios.post("http://localhost:8000/api/workers", {
+        name,
+        role,
+        phone,
+        bio,
+      });
+
+      alert("Worker created successfully");
+
+      // reset
+      setName("");
+      setRole("");
+      setPhone("");
+      setBio("");
+
+    } catch (error) {
+      console.log(error);
+      alert("Error creating worker");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-black text-white p-8">
 
@@ -15,13 +49,15 @@ export default function AddWorkerPage() {
       {/* Form */}
       <div className="max-w-3xl mx-auto bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-md shadow-lg">
 
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
 
           {/* Name */}
           <div>
             <label className="text-sm text-zinc-300">Full Name</label>
             <input
               type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               placeholder="e.g. John Doe"
               className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-blue-500"
             />
@@ -30,7 +66,11 @@ export default function AddWorkerPage() {
           {/* Role */}
           <div>
             <label className="text-sm text-zinc-300">Role</label>
-            <select className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-blue-500">
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-blue-500"
+            >
               <option value="">Select role</option>
               <option value="barber">Barber</option>
               <option value="manager">Manager</option>
@@ -43,6 +83,8 @@ export default function AddWorkerPage() {
             <label className="text-sm text-zinc-300">Phone</label>
             <input
               type="text"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
               placeholder="+212 6..."
               className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-blue-500"
             />
@@ -53,6 +95,8 @@ export default function AddWorkerPage() {
             <label className="text-sm text-zinc-300">Bio</label>
             <textarea
               rows={4}
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
               placeholder="Short description about the worker..."
               className="w-full mt-2 p-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-blue-500"
             />

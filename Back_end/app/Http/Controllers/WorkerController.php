@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Worker;
 
 class WorkerController extends Controller
 {
@@ -24,7 +25,21 @@ class WorkerController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Validation
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'role' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'bio' => 'nullable|string',
+        ]);
+
+        // Create worker
+        $worker = Worker::create($validated);
+
+        return response()->json([
+            'message' => 'Worker created successfully',
+            'data' => $worker
+        ], 201);
     }
 
     /**
