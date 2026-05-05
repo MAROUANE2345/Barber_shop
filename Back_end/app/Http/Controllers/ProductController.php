@@ -8,14 +8,8 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        // Get all products
         $products = Product::latest()->get();
 
         return response()->json([
@@ -23,12 +17,8 @@ class ProductController extends Controller
         ], 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        // Validation
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'objective' => 'required|string|max:255',
@@ -38,12 +28,10 @@ class ProductController extends Controller
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
-        // Image upload
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('products', 'public');
         }
 
-        // Create product
         $product = Product::create($validated);
 
         return response()->json([
@@ -52,18 +40,47 @@ class ProductController extends Controller
         ], 201);
     }
 
-    public function show($id)
-    {
-        //
-    }
-
     public function update(Request $request, $id)
     {
-        //
+        $product = Product::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'objective' => 'sometimes|string|max:255',
+            'description' => 'sometimes|string',
+            'price' => 'sometimes|numeric|min:0',
+            'quantity' => 'nullable|integer|min:0',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+        ]);
+
+        if ($request->hasFile('image')) {
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
+
+            $validated['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        $product->update($validated);
+
+        return response()->json([
+            'message' => 'Product updated successfully',
+            'data' => $product
+        ], 200);
     }
 
     public function destroy($id)
     {
-        //
+        $product = Product::findOrFail($id);
+
+        if ($product->image) {
+            Storage::disk('public')->delete($product->image);
+        }
+
+        $product->delete();
+
+        return response()->json([
+            'message' => 'Product deleted successfully'
+        ], 200);
     }
 }

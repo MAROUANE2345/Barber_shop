@@ -7,25 +7,17 @@ use App\Models\Worker;
 
 class WorkerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
+        $workers = Worker::latest()->get();
+
+        return response()->json([
+            'data' => $workers
+        ], 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        // Validation
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'role' => 'required|string|max:255',
@@ -33,7 +25,6 @@ class WorkerController extends Controller
             'bio' => 'nullable|string',
         ]);
 
-        // Create worker
         $worker = Worker::create($validated);
 
         return response()->json([
@@ -42,37 +33,33 @@ class WorkerController extends Controller
         ], 201);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-        //
+        $worker = Worker::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'role' => 'sometimes|string|max:255',
+            'phone' => 'sometimes|string|max:20',
+            'bio' => 'nullable|string',
+        ]);
+
+        $worker->update($validated);
+
+        return response()->json([
+            'message' => 'Worker updated successfully',
+            'data' => $worker
+        ], 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-        //
+        $worker = Worker::findOrFail($id);
+
+        $worker->delete();
+
+        return response()->json([
+            'message' => 'Worker deleted successfully'
+        ], 200);
     }
 }
