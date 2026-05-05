@@ -1,25 +1,36 @@
 "use client";
+
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
 import { Trash2 } from "lucide-react";
 
-export default function DeleteProductModal({ open, setOpen, productId, productName }) {
+export default function DeleteWorkerModal({
+  open,
+  setOpen,
+  workerId,
+  workerName,
+}) {
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8000/api/products/${productId}`);
+      await axios.delete(
+        `http://localhost:8000/api/workers/${workerId}`
+      );
       setOpen(false);
-      window.location.reload();
+      window.location.reload(); // same pattern as others for now
     } catch (error) {
       console.log(error);
     }
   };
 
+  if (typeof window === "undefined") return null;
+
   const modal = (
     <AnimatePresence>
       {open && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-          {/* Blur backdrop */}
+
+          {/* Backdrop */}
           <motion.div
             className="absolute inset-0 bg-black/60 backdrop-blur-md"
             initial={{ opacity: 0 }}
@@ -36,41 +47,49 @@ export default function DeleteProductModal({ open, setOpen, productId, productNa
             transition={{ duration: 0.18, ease: "easeOut" }}
             className="relative w-full max-w-sm rounded-2xl border border-white/10 bg-zinc-900 p-7 shadow-2xl"
           >
-            {/* Icon + Title */}
+            {/* Header */}
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-11 h-11 rounded-full bg-red-500/10 flex items-center justify-center flex-shrink-0">
+              <div className="w-11 h-11 rounded-full bg-red-500/10 flex items-center justify-center">
                 <Trash2 className="w-5 h-5 text-red-400" />
               </div>
               <div>
-                <h2 className="text-base font-semibold text-white">Delete product</h2>
-                <p className="text-sm text-zinc-400">This action cannot be undone.</p>
+                <h2 className="text-base font-semibold text-white">
+                  Delete worker
+                </h2>
+                <p className="text-sm text-zinc-400">
+                  This action cannot be undone.
+                </p>
               </div>
             </div>
 
-            {/* Warning box */}
+            {/* Warning */}
             <div className="rounded-xl bg-red-500/5 border border-red-500/20 px-4 py-3 mb-6">
               <p className="text-sm text-red-300 leading-relaxed">
-                <span className="font-medium text-red-400">{productName ?? "This product"}</span> will
-                be permanently removed from your inventory.
+                <span className="font-medium text-red-400">
+                  {workerName ?? "This worker"}
+                </span>{" "}
+                will be permanently removed.
               </p>
             </div>
 
             {/* Actions */}
-            <div className="flex items-center justify-end gap-3">
+            <div className="flex justify-end gap-3">
               <button
                 onClick={() => setOpen(false)}
                 className="px-4 py-2 rounded-xl text-sm bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 transition"
               >
                 Cancel
               </button>
+
               <button
                 onClick={handleDelete}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm bg-red-600 hover:bg-red-700 text-white font-medium transition"
               >
                 <Trash2 className="w-4 h-4" />
-                Delete product
+                Delete worker
               </button>
             </div>
+
           </motion.div>
         </div>
       )}

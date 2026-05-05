@@ -67,6 +67,7 @@ export default function ProductCard({ product, index }) {
         open={open}
         setOpen={setOpen}
         productId={product.id}
+        productName={product.name}
       />
     </>
   );
