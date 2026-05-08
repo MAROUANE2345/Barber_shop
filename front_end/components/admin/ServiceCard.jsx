@@ -3,9 +3,11 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import DeleteServiceModal from "./DeleteServiceModal";
+import EditServiceModal from "./EditServiceModal";
 
 export default function ServiceCard({ service, index }) {
-  const [open, setOpen] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
 
   return (
     <>
@@ -53,21 +55,39 @@ export default function ServiceCard({ service, index }) {
           </div>
         </div>
 
-        {/* Delete button */}
-        <button
-          onClick={() => setOpen(true)}
-          className="text-sm px-3 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition"
-        >
-          Delete
-        </button>
+        {/* Actions */}
+        <div className="flex flex-col gap-2">
+          {/* Edit */}
+          <button
+            onClick={() => setOpenEdit(true)}
+            className="text-sm px-3 py-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition"
+          >
+            Edit
+          </button>
+
+          {/* Delete */}
+          <button
+            onClick={() => setOpenDelete(true)}
+            className="text-sm px-3 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition"
+          >
+            Delete
+          </button>
+        </div>
       </motion.div>
 
-      {/* Modal */}
+      {/* Delete Modal */}
       <DeleteServiceModal
-        open={open}
-        setOpen={setOpen}
+        open={openDelete}
+        setOpen={setOpenDelete}
         serviceId={service.id}
         serviceName={service.name}
+      />
+
+      {/* Edit Modal */}
+      <EditServiceModal
+        open={openEdit}
+        setOpen={setOpenEdit}
+        service={service}
       />
     </>
   );

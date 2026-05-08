@@ -3,9 +3,11 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import DeleteWorkerModal from "./DeleteWorkerModal";
+import EditWorkerModal from "./EditWorkerModal";
 
 export default function WorkerCard({ worker, index }) {
-  const [open, setOpen] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
 
   return (
     <>
@@ -38,21 +40,39 @@ export default function WorkerCard({ worker, index }) {
           </div>
         </div>
 
-        {/* Delete button */}
-        <button
-          onClick={() => setOpen(true)}
-          className="text-sm px-3 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition"
-        >
-          Delete
-        </button>
+        {/* Actions */}
+        <div className="flex flex-col gap-2">
+          {/* Edit */}
+          <button
+            onClick={() => setOpenEdit(true)}
+            className="text-sm px-3 py-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition"
+          >
+            Edit
+          </button>
+
+          {/* Delete */}
+          <button
+            onClick={() => setOpenDelete(true)}
+            className="text-sm px-3 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition"
+          >
+            Delete
+          </button>
+        </div>
       </motion.div>
 
-      {/* Modal */}
+      {/* Delete Modal */}
       <DeleteWorkerModal
-        open={open}
-        setOpen={setOpen}
+        open={openDelete}
+        setOpen={setOpenDelete}
         workerId={worker.id}
         workerName={worker.name}
+      />
+
+      {/* Edit Modal */}
+      <EditWorkerModal
+        open={openEdit}
+        setOpen={setOpenEdit}
+        worker={worker}
       />
     </>
   );

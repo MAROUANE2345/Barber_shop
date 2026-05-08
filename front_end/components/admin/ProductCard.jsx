@@ -3,9 +3,11 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import DeleteProductModal from "./DeleteProductModal";
+import EditProductModal from "./EditProductModal";
 
 export default function ProductCard({ product, index }) {
-  const [open, setOpen] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
 
   return (
     <>
@@ -53,21 +55,39 @@ export default function ProductCard({ product, index }) {
           </div>
         </div>
 
-        {/* Delete button */}
-        <button
-          onClick={() => setOpen(true)}
-          className="text-sm px-3 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition"
-        >
-          Delete
-        </button>
+        {/* Actions */}
+        <div className="flex flex-col gap-2">
+          {/* Edit */}
+          <button
+            onClick={() => setOpenEdit(true)}
+            className="text-sm px-3 py-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition"
+          >
+            Edit
+          </button>
+
+          {/* Delete */}
+          <button
+            onClick={() => setOpenDelete(true)}
+            className="text-sm px-3 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition"
+          >
+            Delete
+          </button>
+        </div>
       </motion.div>
 
-      {/* Modal */}
+      {/* Delete Modal */}
       <DeleteProductModal
-        open={open}
-        setOpen={setOpen}
+        open={openDelete}
+        setOpen={setOpenDelete}
         productId={product.id}
         productName={product.name}
+      />
+
+      {/* Edit Modal */}
+      <EditProductModal
+        open={openEdit}
+        setOpen={setOpenEdit}
+        product={product}
       />
     </>
   );
